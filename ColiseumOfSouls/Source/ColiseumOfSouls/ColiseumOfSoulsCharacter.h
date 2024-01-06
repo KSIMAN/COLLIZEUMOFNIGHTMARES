@@ -48,6 +48,7 @@ public:
 	AColiseumOfSoulsCharacter();
 	
 
+
 protected:
 
 	/** Called for movement input */
@@ -57,6 +58,35 @@ protected:
 	void Look(const FInputActionValue& Value);
 			
 
+
+	/**  Player Variables */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class APlayerHUD* MainHUDPtr;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float health; //Player Health 
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float stamina; //For Running, not magic
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float mana; //For Magic
+
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float max_health; //Player Health 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float max_stamina; //For Running, not magic
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float max_mana; //For Magic
+
+
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -65,9 +95,37 @@ protected:
 	virtual void BeginPlay();
 
 public:
+
+
+	//-------------* Getters *----------------/
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/* Returns Health of Character from 0 to 1000*/
+	FORCEINLINE float GetHealth() { return health; };
+
+	/* Returns Stamina of Character from 0 to 1000*/
+	FORCEINLINE float GetStamina() { return stamina; };
+
+	/* Returns Mana of Character from 0 to 1000*/
+	FORCEINLINE float GetMana() { return mana; };
+
+
+
+	//-------------* Setters *----------------/
+
+	void addHealth(float health_to_add);
+	void RemoveHealth(float health_to_remove);
+
+	void addStamina(float stamina_to_add);
+	void RemoveStamina(float stamina_to_remove);
+
+	void addMana(float mana_to_add);
+	void RemoveMana(float mana_to_remove);
+
 };
 

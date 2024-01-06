@@ -1,6 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ColiseumOfSoulsCharacter.h"
+#include "UI/PlayerHUD.h"
+#include "UI/BaseWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameMode.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -16,7 +20,12 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AColiseumOfSoulsCharacter
 
-AColiseumOfSoulsCharacter::AColiseumOfSoulsCharacter()
+AColiseumOfSoulsCharacter::AColiseumOfSoulsCharacter() : max_health(1000.f), 
+max_mana(1000.f),
+max_stamina(1000.0f),
+health(1000.0f),
+mana(1000.0f),
+stamina(1000.0f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -67,6 +76,60 @@ void AColiseumOfSoulsCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
+	MainHUDPtr = Cast<APlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+	if (!MainHUDPtr)
+		return;
+
+	//Full Life And Stamina And Mana
+	MainHUDPtr->BaseWidgetPtr->SetHealth(500.f);
+	MainHUDPtr->BaseWidgetPtr->SetMana(1000.f);
+	MainHUDPtr->BaseWidgetPtr->SetStamina(1000.f);
+}
+
+void AColiseumOfSoulsCharacter::addHealth(float health_to_add)
+{
+
+	float total_health = health_to_add + GetHealth();
+	if (total_health >= max_health)
+		health = max_health;
+	else
+		health = total_health;
+
+	MainHUDPtr->BaseWidgetPtr->SetHealth(total_health);
+
+	//Add Heal Effect Here
+
+
+}
+
+void AColiseumOfSoulsCharacter::RemoveHealth(float health_to_remove)
+{
+	float total_health = GetHealth() - health_to_remove;
+	if (total_health < 0)
+		health = 0;
+	else
+		health = total_health;
+
+	MainHUDPtr->BaseWidgetPtr->SetHealth(total_health);
+
+	//Add Damage Effect Here
+}
+
+void AColiseumOfSoulsCharacter::addStamina(float stamina_to_add)
+{
+}
+
+void AColiseumOfSoulsCharacter::RemoveStamina(float stamina_to_remove)
+{
+}
+
+void AColiseumOfSoulsCharacter::addMana(float mana_to_add)
+{
+}
+
+void AColiseumOfSoulsCharacter::RemoveMana(float mana_to_remove)
+{
 }
 
 //////////////////////////////////////////////////////////////////////////
