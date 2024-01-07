@@ -20,12 +20,12 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AColiseumOfSoulsCharacter
 
-AColiseumOfSoulsCharacter::AColiseumOfSoulsCharacter() : max_health(1000.f), 
+AColiseumOfSoulsCharacter::AColiseumOfSoulsCharacter() :
 max_mana(1000.f),
 max_stamina(1000.0f),
-health(1000.0f),
 mana(1000.0f),
-stamina(1000.0f)
+stamina(1000.0f),
+ABaseMob(1000.f, 1000.f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -59,14 +59,45 @@ stamina(1000.0f)
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	
+
 }
+
+//---Interface Functions-------------------------------------------------
+
+void AColiseumOfSoulsCharacter::OnDeath()
+{
+	Super::OnDeath();
+	//Play Die Sound
+	GetMesh()->GetAnimInstance()->Montage_Play(deathAnimation);
+}
+
+void AColiseumOfSoulsCharacter::RecieveDamage(float fDamage)
+{
+	//Maybe need Damage types
+	Super::RecieveDamage(fDamage);
+	
+	RemoveHealth(fDamage);
+	//Play Hit Sound
+
+	GetMesh()->GetAnimInstance()->Montage_Play(damagedAnimation);
+}
+
+
+void AColiseumOfSoulsCharacter::MakeHit(ABaseMob* pActorToHit)
+{
+	Super::MakeHit(pActorToHit);
+	//Get Hit Type (Maybe not here, get type upper and return to this function)
+}
+//------------------------------------------------------------------------
+
 
 void AColiseumOfSoulsCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &AColiseumOfSoulsCharacter::HandleOnMontageEnded);
 
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -85,6 +116,8 @@ void AColiseumOfSoulsCharacter::BeginPlay()
 	MainHUDPtr->BaseWidgetPtr->SetHealth(500.f);
 	MainHUDPtr->BaseWidgetPtr->SetMana(1000.f);
 	MainHUDPtr->BaseWidgetPtr->SetStamina(1000.f);
+
+	RecieveDamage(100.f);
 }
 
 void AColiseumOfSoulsCharacter::addHealth(float health_to_add)
@@ -96,7 +129,7 @@ void AColiseumOfSoulsCharacter::addHealth(float health_to_add)
 	else
 		health = total_health;
 
-	MainHUDPtr->BaseWidgetPtr->SetHealth(total_health);
+	MainHUDPtr->BaseWidgetPtr->SetHealth(health);
 
 	//Add Heal Effect Here
 
@@ -106,18 +139,26 @@ void AColiseumOfSoulsCharacter::addHealth(float health_to_add)
 void AColiseumOfSoulsCharacter::RemoveHealth(float health_to_remove)
 {
 	float total_health = GetHealth() - health_to_remove;
-	if (total_health < 0)
-		health = 0;
+	if (total_health < 0.f)
+		health = 0.f;
 	else
 		health = total_health;
 
-	MainHUDPtr->BaseWidgetPtr->SetHealth(total_health);
-
-	//Add Damage Effect Here
+	MainHUDPtr->BaseWidgetPtr->SetHealth(health);
+	
+	if (health <= 0.f)
+		OnDeath();
 }
 
 void AColiseumOfSoulsCharacter::addStamina(float stamina_to_add)
 {
+	float total_stamina = GetStamina() + stamina_to_add;
+	if (total_stamina > max_stamina)
+		stamina = max_stamina;
+	else
+		stamina = total_stamina;
+
+	MainHUDPtr->BaseWidgetPtr->SetStamina(stamina);
 }
 
 void AColiseumOfSoulsCharacter::RemoveStamina(float stamina_to_remove)
@@ -189,5 +230,16 @@ void AColiseumOfSoulsCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AColiseumOfSoulsCharacter::HandleOnMontageEnded(UAnimMontage* Montage, bool Interrupted)
+{
+	if (Montage == deathAnimation)
+	{
+		GetMesh()->GetAnimInstance()->StopSlotAnimation();
+		GetMesh()->GetAnimInstance()->StopAllMontages(0.0f);
+		GetMesh()->SetSimulatePhysics(true);
+		GetWorld()->GetFirstPlayerController()->SetPause(true);
 	}
 }

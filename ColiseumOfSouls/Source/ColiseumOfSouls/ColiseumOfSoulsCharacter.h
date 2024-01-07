@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Mobs/BaseMob.h"
 #include "Logging/LogMacros.h"
 #include "ColiseumOfSoulsCharacter.generated.h"
 
@@ -16,7 +17,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AColiseumOfSoulsCharacter : public ACharacter
+class AColiseumOfSoulsCharacter : public ABaseMob
 {
 	GENERATED_BODY()
 
@@ -46,7 +47,20 @@ class AColiseumOfSoulsCharacter : public ACharacter
 
 public:
 	AColiseumOfSoulsCharacter();
-	
+
+
+	UFUNCTION( BlueprintCallable)
+	virtual void OnDeath() override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void RecieveDamage(float fDamage) override;					//When Creature recieve damage
+
+	UFUNCTION(BlueprintCallable)
+	virtual void MakeHit(ABaseMob* pActorToHit) override;				//When Creature makes Hit
+
+
+
+
 
 
 protected:
@@ -56,17 +70,17 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+	
+	/** Delegates */
+
+	UFUNCTION()
+	void HandleOnMontageEnded(UAnimMontage* Montage, bool Interrupted);
 
 
 	/**  Player Variables */
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class APlayerHUD* MainHUDPtr;
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
-	float health; //Player Health 
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
 	float stamina; //For Running, not magic
@@ -74,10 +88,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
 	float mana; //For Magic
 
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
-	float max_health; //Player Health 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
 	float max_stamina; //For Running, not magic
