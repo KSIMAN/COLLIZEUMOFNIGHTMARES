@@ -26,11 +26,8 @@ public:
 
 	//---Interface Functions-------------------------------------------------
 
-	UFUNCTION()
-	virtual void OnDeath() override;										//When Creture Dies		
-	UFUNCTION()
+	virtual void OnDeath() override;									//When Creture Dies		
 	virtual void RecieveDamage(float fDamage) override;					//When Creature recieve damage
-	UFUNCTION()
-	virtual void MakeHit(ABaseMob* pActorToHit)override;				//When Creature makes Hit
+	virtual void MakeHit(ABaseMob* pActorToHit) override;				//When Creature makes Hit
 	
 };

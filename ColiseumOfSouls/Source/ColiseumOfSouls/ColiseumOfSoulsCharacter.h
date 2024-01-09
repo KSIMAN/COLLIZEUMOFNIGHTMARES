@@ -48,20 +48,9 @@ class AColiseumOfSoulsCharacter : public ABaseMob
 public:
 	AColiseumOfSoulsCharacter();
 
-
-	UFUNCTION( BlueprintCallable)
 	virtual void OnDeath() override;
-
-	UFUNCTION(BlueprintCallable)
 	virtual void RecieveDamage(float fDamage) override;					//When Creature recieve damage
-
-	UFUNCTION(BlueprintCallable)
 	virtual void MakeHit(ABaseMob* pActorToHit) override;				//When Creature makes Hit
-
-
-
-
-
 
 protected:
 

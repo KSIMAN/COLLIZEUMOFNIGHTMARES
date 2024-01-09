@@ -7,7 +7,7 @@
 #include "CreatureInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, NotBlueprintable)
 class UCreatureInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -26,11 +26,11 @@ class COLISEUMOFSOULS_API ICreatureInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION()
-	virtual void OnDeath();										//When Creture Dies		
-	UFUNCTION()
-	virtual void RecieveDamage(float fDamage);					//When Creature recieve damage
-	UFUNCTION()
-	virtual void MakeHit(ABaseMob* pActorToHit);				//When Creature makes Hit
+	UFUNCTION(BlueprintCallable)
+	virtual void OnDeath() = 0;										//When Creture Dies		
+	UFUNCTION(BlueprintCallable)
+	virtual void RecieveDamage(float fDamage) = 0;					//When Creature recieve damage
+	UFUNCTION(BlueprintCallable)
+	virtual void MakeHit(ABaseMob* pActorToHit) = 0;				//When Creature makes Hit
 
 };

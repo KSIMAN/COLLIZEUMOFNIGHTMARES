@@ -40,6 +40,15 @@ void AZombieMob::OnDeath()
 void AZombieMob::RecieveDamage(float fDamage)
 {
 	Super::RecieveDamage(fDamage);
+	
+	float total_health = health - fDamage;
+	if (total_health < 0.f)
+		health = 0.f;
+	else
+		health = total_health;
+	
+	if (health <= 0.f)
+		OnDeath();
 }
 
 void AZombieMob::MakeHit(ABaseMob* pActorToHit)

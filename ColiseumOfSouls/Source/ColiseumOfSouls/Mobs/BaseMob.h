@@ -19,6 +19,13 @@ public:
 
 	ABaseMob(float _health, float _max_health);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void OnDeath() {};										//When Creture Dies		
+	UFUNCTION(BlueprintCallable)
+	virtual void RecieveDamage(float fDamage) {};					//When Creature recieve damage
+	UFUNCTION(BlueprintCallable)
+	virtual void MakeHit(ABaseMob* pActorToHit) {};				//When Creature makes Hit
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	float health;
 
