@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HealthComponent.h"
 #include "UObject/Interface.h"
 #include "CreatureInterface.generated.h"
 
@@ -27,10 +28,12 @@ class COLISEUMOFSOULS_API ICreatureInterface
 public:
 
 	UFUNCTION(BlueprintCallable)
+	virtual UHealthComponent* GetHealthComponent() = 0;
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void OnDeath() = 0;										//When Creture Dies		
 	UFUNCTION(BlueprintCallable)
 	virtual void RecieveDamage(float fDamage) = 0;					//When Creature recieve damage
 	UFUNCTION(BlueprintCallable)
-	virtual void MakeHit(ABaseMob* pActorToHit) = 0;				//When Creature makes Hit
-
+	virtual void MakeHit(ABaseMob* pActorToHit) = 0;	
 };

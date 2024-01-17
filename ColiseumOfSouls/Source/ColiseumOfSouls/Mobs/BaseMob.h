@@ -25,6 +25,15 @@ public:
 	virtual void RecieveDamage(float fDamage) {};					//When Creature recieve damage
 	UFUNCTION(BlueprintCallable)
 	virtual void MakeHit(ABaseMob* pActorToHit) {};				//When Creature makes Hit
+	
+	UFUNCTION(BlueprintCallable)
+	virtual UHealthComponent* GetHealthComponent() override
+	{
+		return HealthComponent;
+	}
+
+	UPROPERTY(BlueprintReadWrite, Category = Variables)
+	UHealthComponent* HealthComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	float health;
