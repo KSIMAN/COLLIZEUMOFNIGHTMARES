@@ -69,7 +69,19 @@ void AColiseumOfSoulsCharacter::OnDeath()
 {
 	Super::OnDeath();
 	//Play Die Sound
-	GetMesh()->GetAnimInstance()->Montage_Play(deathAnimation);
+	GetMesh()->GetAnimInstance()->Montage_Play(getContentHolder()->deathAnimation);
+	FTimerHandle timerHandle;
+	FTimerDelegate deathDel; // Delegate to bind function with parameters
+
+	UGameplayStatics::PlaySound2D(GetWorld(), getContentHolder()->deathSound, 1.0f, 1.0f, 0.0f);
+
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&] {
+		if (MainHUDPtr->GameOverWidgetPtr)
+			MainHUDPtr->GameOverWidgetPtr->AddToViewport(666); }), 3.0f, false);
+
+	//GetWorld()->GetTimerManager().SetTimer(timerHandle, deathDel, 7.0f, false);
+
+
 }
 
 void AColiseumOfSoulsCharacter::RecieveDamage(float fDamage)
@@ -80,7 +92,7 @@ void AColiseumOfSoulsCharacter::RecieveDamage(float fDamage)
 	RemoveHealth(fDamage);
 	//Play Hit Sound
 
-	GetMesh()->GetAnimInstance()->Montage_Play(damagedAnimation);
+	GetMesh()->GetAnimInstance()->Montage_Play(getContentHolder()->damagedAnimation);
 }
 
 
@@ -235,11 +247,12 @@ void AColiseumOfSoulsCharacter::Look(const FInputActionValue& Value)
 
 void AColiseumOfSoulsCharacter::HandleOnMontageEnded(UAnimMontage* Montage, bool Interrupted)
 {
-	if (Montage == deathAnimation)
+	if (Montage == getContentHolder()->deathAnimation)
 	{
-		GetMesh()->GetAnimInstance()->StopSlotAnimation();
-		GetMesh()->GetAnimInstance()->StopAllMontages(0.0f);
-		GetMesh()->SetSimulatePhysics(true);
-		GetWorld()->GetFirstPlayerController()->SetPause(true);
+
+		//GetMesh()->GetAnimInstance()->StopSlotAnimation();
+		////GetMesh()->GetAnimInstance()->StopAllMontages(0.0f);
+		//GetMesh()->SetSimulatePhysics(true);
+		//GetWorld()->GetFirstPlayerController()->SetPause(true);
 	}
 }

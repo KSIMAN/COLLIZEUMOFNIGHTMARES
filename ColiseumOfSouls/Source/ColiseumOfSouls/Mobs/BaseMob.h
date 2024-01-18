@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../Interfaces/CreatureInterface.h"
-#include "Animation/AnimMontage.h"
+#include "../Components/ContentHolderComponent.h"
 #include "BaseMob.generated.h"
+
 
 UCLASS()
 class COLISEUMOFSOULS_API ABaseMob : public ACharacter, public ICreatureInterface
@@ -26,14 +27,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void MakeHit(ABaseMob* pActorToHit) {};				//When Creature makes Hit
 	
-	UFUNCTION(BlueprintCallable)
-	virtual UHealthComponent* GetHealthComponent() override
-	{
-		return HealthComponent;
-	}
 
 	UPROPERTY(BlueprintReadWrite, Category = Variables)
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Assets)
+	UContentHolderComponent* contentHolder;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	float health;
@@ -44,18 +43,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	int attackResetTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	UAnimMontage* attackAnimation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	UAnimMontage* deathAnimation;
+	//----Getters------------------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	UAnimMontage* damagedAnimation;
+	UFUNCTION(BlueprintCallable)
+	virtual UHealthComponent* GetHealthComponent() override
+	{
+		return HealthComponent;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	UContentHolderComponent* getContentHolder() { return contentHolder; }
+
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 public:	
 	// Called every frame

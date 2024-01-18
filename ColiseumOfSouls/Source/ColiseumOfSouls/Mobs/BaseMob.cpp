@@ -13,10 +13,11 @@ ABaseMob::ABaseMob(float _health, float _max_health) :
 	health(_health), max_health(_max_health)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	attackAnimation = CreateDefaultSubobject<UAnimMontage>("Attack Animation");
-	deathAnimation = CreateDefaultSubobject<UAnimMontage>("Death Animation");
-	damagedAnimation = CreateDefaultSubobject<UAnimMontage>("Take Damage Animation");
+	contentHolder = CreateDefaultSubobject<UContentHolderComponent>("Content Holder Component");
+
+	//getContentHolder()->attackAnimation = CreateDefaultSubobject<UAnimMontage>("Attack Animation");
+	//getContentHolder()->deathAnimation = CreateDefaultSubobject<UAnimMontage>("Death Animation");
+	//getContentHolder()->damagedAnimation = CreateDefaultSubobject<UAnimMontage>("Take Damage Animation");
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
 }

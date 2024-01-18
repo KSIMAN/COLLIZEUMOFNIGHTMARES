@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+class UUserWidget;
+
 UCLASS()
 class COLISEUMOFSOULS_API APlayerHUD : public AHUD
 {
@@ -18,7 +21,25 @@ public:
 
 	virtual void BeginPlay() override;
 
-	TSubclassOf<class UBaseWidget> BaseWidgetRef;
 
+	//-----Widgets------------------------------------------------------
+
+	//Base Player Widget
+	TSubclassOf<class UBaseWidget> BaseWidgetRef;
 	UBaseWidget* BaseWidgetPtr;
+
+
+	//Game over widget
+
+	TSubclassOf<UUserWidget> GameOverWidgetRef;
+	UUserWidget* GameOverWidgetPtr;
+
+	//Victory Widget
+	TSubclassOf<UUserWidget> VictoryWidgetRef;
+	UUserWidget* VictoryWidgetPtr;
+
+	//Pause Widget
+	TSubclassOf<UUserWidget> PauseWidgetRef;
+	UUserWidget* PauseWidgetPtr;
+
 };
