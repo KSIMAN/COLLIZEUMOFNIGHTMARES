@@ -5,12 +5,7 @@
 
 // Sets default values
 
-ABaseMob::ABaseMob() : ABaseMob(0, 0)
-{
-}
-
-ABaseMob::ABaseMob(float _health, float _max_health) :
-	health(_health), max_health(_max_health)
+ABaseMob::ABaseMob()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	contentHolder = CreateDefaultSubobject<UContentHolderComponent>("Content Holder Component");
@@ -22,11 +17,16 @@ ABaseMob::ABaseMob(float _health, float _max_health) :
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
 }
 
+void ABaseMob::InitCreatureHealth(int MaxHealth, int CurrentHealth)
+{
+	HealthComponent->HandleHealthReset(MaxHealth, CurrentHealth);
+	HealthComponent->HealthObserver.AddDynamic(this, &ICreatureInterface::OnHealthChanged);
+}
+
 // Called when the game starts or when spawned
 void ABaseMob::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

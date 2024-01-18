@@ -3,24 +3,23 @@
 
 #include "ZombieMob.h"
 #include "../ColiseumOfSoulsCharacter.h"
-#include "Components/CapsuleComponent.h"
 
-AZombieMob::AZombieMob() : ABaseMob(200.f, 200.f)
+AZombieMob::AZombieMob()
 {
-	
 }
 
 void AZombieMob::BeginPlay()
 {
 	Super::BeginPlay();
-	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AZombieMob::OnOverlapBegin);
+	InitCreatureHealth(200, 200);
+	OnActorBeginOverlap.AddDynamic(this, &AZombieMob::OnOverlapBegin);
 }
 
-void AZombieMob::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AZombieMob::OnOverlapBegin(AActor* CurrentActor, AActor* OtherActor)
 {
 	if (Cast<AColiseumOfSoulsCharacter>(OtherActor) != nullptr)
 	{
-		MakeHit(Cast<AColiseumOfSoulsCharacter>(OtherActor));
+		MakeHit(OtherActor);
 	}
 }
 
@@ -37,24 +36,23 @@ void AZombieMob::OnDeath()
 	Destroy();
 }
 
-void AZombieMob::RecieveDamage(float fDamage)
+void AZombieMob::OnHealthChanged(int MaxHealth, int CurrentHealth)
 {
-	Super::RecieveDamage(fDamage);
-	
-	float total_health = health - fDamage;
-	if (total_health < 0.f)
-		health = 0.f;
-	else
-		health = total_health;
-	
-	if (health <= 0.f)
+	Super::OnHealthChanged(MaxHealth, CurrentHealth);
+	if (CurrentHealth <= 0)
 		OnDeath();
 }
 
-void AZombieMob::MakeHit(ABaseMob* pActorToHit)
+void AZombieMob::ReceiveDamage(int Damage)
 {
-	if (!pActorToHit)
+	Super::ReceiveDamage(Damage);
+	GetHealthComponent()->HandleHealthChange(-Damage);
+}
+
+void AZombieMob::MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit)
+{
+	if (!CreatureToHit)
 		return;
 
-	pActorToHit->RecieveDamage(10.f); 
+	CreatureToHit->ReceiveDamage(10);
 }

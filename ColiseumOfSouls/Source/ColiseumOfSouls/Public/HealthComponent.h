@@ -7,7 +7,6 @@
 #include "UObject/Class.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_DELEGATE_OneParam(FHObs, float)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChangeObserver, int, MaxHP, int, CurrentHP);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -20,17 +19,18 @@ public:
 	UHealthComponent();
 	// Sets default values for this component's properties
 	UHealthComponent(int MaxHp, int CurrentHp);
-
-	int MaxHealth;
-	int CurrentHealth;
+	
+	UFUNCTION(BlueprintCallable)
+	int GetMaxHealth() { return MaxHealth; }
+	
+	UFUNCTION(BlueprintCallable)
+	int GetCurrentHealth() { return CurrentHealth; }
 
 	UPROPERTY(BlueprintAssignable)
 	FHealthChangeObserver HealthObserver;
-	
-	FHObs Obs;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void HandleHealthChange(int Change);
+	virtual void HandleHealthChange(int Change); // If Change is damage, must be < 0
 
 	UFUNCTION(BlueprintCallable)
 	virtual void HandleHealthReset(int MaxHP, int CurrentHP);
@@ -39,9 +39,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	int MaxHealth;
+	int CurrentHealth;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	
 };

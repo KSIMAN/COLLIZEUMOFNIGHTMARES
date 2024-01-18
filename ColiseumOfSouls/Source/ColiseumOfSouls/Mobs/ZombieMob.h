@@ -21,13 +21,15 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnOverlapBegin(AActor* CurrentActor, AActor* OtherActor);
 
 
 	//---Interface Functions-------------------------------------------------
+	
+	virtual void ReceiveDamage(int Damage) override;
 
-	virtual void OnDeath() override;									//When Creture Dies		
-	virtual void RecieveDamage(float fDamage) override;					//When Creature recieve damage
-	virtual void MakeHit(ABaseMob* pActorToHit) override;				//When Creature makes Hit
+	virtual void OnDeath() override;
+	virtual void OnHealthChanged(int MaxHealth, int CurrentHealth) override;
+	virtual void MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit) override;
 	
 };

@@ -48,9 +48,11 @@ class AColiseumOfSoulsCharacter : public ABaseMob
 public:
 	AColiseumOfSoulsCharacter();
 
+	virtual void ReceiveDamage(int Damage) override;
+	
 	virtual void OnDeath() override;
-	virtual void RecieveDamage(float fDamage) override;					//When Creature recieve damage
-	virtual void MakeHit(ABaseMob* pActorToHit) override;				//When Creature makes Hit
+	virtual void OnHealthChanged(int MaxHealth, int CurrentHealth) override;
+	virtual void MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit) override;
 
 protected:
 
@@ -72,19 +74,14 @@ protected:
 	class APlayerHUD* MainHUDPtr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float max_stamina; //For Running, not magic
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
 	float stamina; //For Running, not magic
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
-	float mana; //For Magic
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
-	float max_stamina; //For Running, not magic
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
 	float max_mana; //For Magic
-
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Variables)
+	float mana; //For Magic
 
 protected:
 	// APawn interface
@@ -104,9 +101,6 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	/* Returns Health of Character from 0 to 1000*/
-	FORCEINLINE float GetHealth() { return health; };
-
 	/* Returns Stamina of Character from 0 to 1000*/
 	FORCEINLINE float GetStamina() { return stamina; };
 
@@ -116,9 +110,6 @@ public:
 
 
 	//-------------* Setters *----------------/
-
-	void addHealth(float health_to_add);
-	void RemoveHealth(float health_to_remove);
 
 	void addStamina(float stamina_to_add);
 	void RemoveStamina(float stamina_to_remove);

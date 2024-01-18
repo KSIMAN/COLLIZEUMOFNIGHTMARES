@@ -17,15 +17,19 @@ class COLISEUMOFSOULS_API ABaseMob : public ACharacter, public ICreatureInterfac
 public:
 	// Sets default values for this character's properties
 	ABaseMob();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void InitCreatureHealth(int MaxHealth, int CurrentHealth) override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void ReceiveDamage(int Damage) override {}
 
-	ABaseMob(float _health, float _max_health);
-
 	UFUNCTION(BlueprintCallable)
-	virtual void OnDeath() {};										//When Creture Dies		
+	virtual void OnDeath() override {}
 	UFUNCTION(BlueprintCallable)
-	virtual void RecieveDamage(float fDamage) {};					//When Creature recieve damage
+	virtual void OnHealthChanged(int MaxHealth, int CurrentHealth) override {}
 	UFUNCTION(BlueprintCallable)
-	virtual void MakeHit(ABaseMob* pActorToHit) {};				//When Creature makes Hit
+	virtual void MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit) override {}
 	
 
 	UPROPERTY(BlueprintReadWrite, Category = Variables)
@@ -33,12 +37,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Assets)
 	UContentHolderComponent* contentHolder;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
-	float health;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
-	float max_health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	int attackResetTime;

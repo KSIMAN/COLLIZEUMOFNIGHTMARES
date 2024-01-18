@@ -29,11 +29,18 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual UHealthComponent* GetHealthComponent() = 0;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void InitCreatureHealth(int MaxHealth, int CurrentHealth) = 0;
+
+	// Обработчик урона от других существ, в будущем должен быть заменён на компонент
+	UFUNCTION(BlueprintCallable)
+	virtual void ReceiveDamage(int Damage) = 0;
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void OnDeath() = 0;										//When Creture Dies		
+	virtual void OnDeath() = 0;
 	UFUNCTION(BlueprintCallable)
-	virtual void RecieveDamage(float fDamage) = 0;					//When Creature recieve damage
+	virtual void OnHealthChanged(int MaxHealth, int CurrentHealth) = 0;
 	UFUNCTION(BlueprintCallable)
-	virtual void MakeHit(ABaseMob* pActorToHit) = 0;	
+	virtual void MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit) = 0;
 };

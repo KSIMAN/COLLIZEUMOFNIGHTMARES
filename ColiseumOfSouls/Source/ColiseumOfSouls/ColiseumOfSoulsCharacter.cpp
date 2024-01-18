@@ -4,7 +4,6 @@
 #include "UI/PlayerHUD.h"
 #include "UI/BaseWidget.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/GameMode.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -21,11 +20,10 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AColiseumOfSoulsCharacter
 
 AColiseumOfSoulsCharacter::AColiseumOfSoulsCharacter() :
-max_mana(1000.f),
-max_stamina(1000.0f),
-mana(1000.0f),
-stamina(1000.0f),
-ABaseMob(1000.f, 1000.f)
+	max_stamina(1000.0f),
+	stamina(1000.0f),
+	max_mana(1000.f),
+	mana(1000.0f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -58,9 +56,7 @@ ABaseMob(1000.f, 1000.f)
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
 	
-
 }
 
 //---Interface Functions-------------------------------------------------
@@ -76,7 +72,7 @@ void AColiseumOfSoulsCharacter::OnDeath()
 	UGameplayStatics::PlaySound2D(GetWorld(), getContentHolder()->deathSound, 1.0f, 1.0f, 0.0f);
 
 	GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&] {
-		if (MainHUDPtr->GameOverWidgetPtr)
+		if (MainHUDPtr && MainHUDPtr->GameOverWidgetPtr)
 			MainHUDPtr->GameOverWidgetPtr->AddToViewport(666); }), 3.0f, false);
 
 	//GetWorld()->GetTimerManager().SetTimer(timerHandle, deathDel, 7.0f, false);
@@ -84,21 +80,27 @@ void AColiseumOfSoulsCharacter::OnDeath()
 
 }
 
-void AColiseumOfSoulsCharacter::RecieveDamage(float fDamage)
+void AColiseumOfSoulsCharacter::OnHealthChanged(int MaxHealth, int CurrentHealth)
+{
+	Super::OnHealthChanged(MaxHealth, CurrentHealth);
+
+	if (MainHUDPtr && MainHUDPtr->BaseWidgetPtr)
+		MainHUDPtr->BaseWidgetPtr->SetHealth(CurrentHealth);
+}
+
+void AColiseumOfSoulsCharacter::ReceiveDamage(int Damage)
 {
 	//Maybe need Damage types
-	Super::RecieveDamage(fDamage);
-	
-	RemoveHealth(fDamage);
-	//Play Hit Sound
+	Super::ReceiveDamage(Damage);
+	GetHealthComponent()->HandleHealthChange(-Damage);
 
 	GetMesh()->GetAnimInstance()->Montage_Play(getContentHolder()->damagedAnimation);
 }
 
 
-void AColiseumOfSoulsCharacter::MakeHit(ABaseMob* pActorToHit)
+void AColiseumOfSoulsCharacter::MakeHit(TScriptInterface<ICreatureInterface> CreatureToHit)
 {
-	Super::MakeHit(pActorToHit);
+	Super::MakeHit(CreatureToHit);
 	//Get Hit Type (Maybe not here, get type upper and return to this function)
 }
 //------------------------------------------------------------------------
@@ -108,6 +110,7 @@ void AColiseumOfSoulsCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	InitCreatureHealth(1000, 1000);
 
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &AColiseumOfSoulsCharacter::HandleOnMontageEnded);
 
@@ -129,37 +132,7 @@ void AColiseumOfSoulsCharacter::BeginPlay()
 	MainHUDPtr->BaseWidgetPtr->SetMana(1000.f);
 	MainHUDPtr->BaseWidgetPtr->SetStamina(1000.f);
 
-	RecieveDamage(100.f);
-}
-
-void AColiseumOfSoulsCharacter::addHealth(float health_to_add)
-{
-
-	float total_health = health_to_add + GetHealth();
-	if (total_health >= max_health)
-		health = max_health;
-	else
-		health = total_health;
-
-	MainHUDPtr->BaseWidgetPtr->SetHealth(health);
-
-	//Add Heal Effect Here
-
-
-}
-
-void AColiseumOfSoulsCharacter::RemoveHealth(float health_to_remove)
-{
-	float total_health = GetHealth() - health_to_remove;
-	if (total_health < 0.f)
-		health = 0.f;
-	else
-		health = total_health;
-
-	MainHUDPtr->BaseWidgetPtr->SetHealth(health);
-	
-	if (health <= 0.f)
-		OnDeath();
+	ReceiveDamage(100);
 }
 
 void AColiseumOfSoulsCharacter::addStamina(float stamina_to_add)
@@ -170,7 +143,8 @@ void AColiseumOfSoulsCharacter::addStamina(float stamina_to_add)
 	else
 		stamina = total_stamina;
 
-	MainHUDPtr->BaseWidgetPtr->SetStamina(stamina);
+	if (MainHUDPtr && MainHUDPtr->BaseWidgetPtr)
+		MainHUDPtr->BaseWidgetPtr->SetStamina(stamina);
 }
 
 void AColiseumOfSoulsCharacter::RemoveStamina(float stamina_to_remove)
